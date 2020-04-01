@@ -1,0 +1,66 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.0.5.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.7.RELEASE'
+    id 'maven-publish'
+    id 'org.sonarqube' version "2.8"
+}
+
+repositories {
+    mavenCentral()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact bootJar
+            groupId = project.property('groupId')
+            artifactId = project.property('artifactId')
+        }
+    }
+    repositories {
+        maven {
+            url = project.property('publishRepository')
+            credentials {
+                username = "$System.env.NEXUS_LOGIN"
+                password = "$System.env.NEXUS_PASSWORD"
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    components {
+        withModule('org.springframework:spring-beans') {
+            allVariants {
+                withDependencyConstraints {
+                    // Need to patch constraints because snakeyaml is an optional dependency
+                    it.findAll { it.name == 'snakeyaml' }.each { it.version { strictly '1.19' } }
+                }
+            }
+        }
+    }
+}
+
+bootJar {
+    mainClassName = 'springboot.sample.App'
+}
+
+publish {
+    dependsOn bootJar
+}
+
+sonarqube {
+    properties{
+        property 'sonar.java.coveragePlugin', 'jacoco'
+        property 'sonar.host.url', project.property('sonar.host.url')
+        property 'sonar.login', "$System.env.SONAR_LOGIN"
+        property 'sonar.password', "$System.env.SONAR_PASSWORD"
+        property 'sonar.sourceEncoding', 'UTF-8'
+    }
+}

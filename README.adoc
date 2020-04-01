@@ -1,0 +1,18 @@
+= springboot-sample
+
+Sample java springboot project with gradle publishing and sonarqube tasks to test in CI pipelines
+
+== environment
+
+Following environment variables have to be set to use publishing to nexus and sonarqube
+
+. SONAR_LOGIN
+. SONAR_PASSWORD
+. NEXUS_LOGIN
+. NEXUS_PASSWORD
+
+== example
+
+[source,shell]
+----
+gradle clean publish sonarqube -Pversion=custom
