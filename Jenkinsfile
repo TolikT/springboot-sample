@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('checkout scm') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github', url: 'git@github.com:TolikT/springboot-sample.git']]])
+                checkout scm
             }
         }
         stage('build and publish') {
